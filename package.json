@@ -1,0 +1,22 @@
+{
+  "name": "syamsoul-laravel-form-js",
+  "version": "1.0.2",
+  "description": "NPM package developed especially for Laravel.",
+  "main": "src/syamsoul-laravel-form-js.js",
+  "dependencies": {
+    "jquery": ">=3.4.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syamsoul/laravel-form-js.git"
+  },
+  "author": "Syamsoul Azrien Muda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/syamsoul/laravel-form-js/issues"
+  },
+  "homepage": "https://github.com/syamsoul/laravel-form-js#readme"
+}
