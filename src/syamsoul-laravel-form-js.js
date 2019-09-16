@@ -227,7 +227,6 @@
 			if ( methods[methodOrOptions] ) {
 				return methods[ methodOrOptions ].apply( this, Array.prototype.slice.call( arguments, 1 ));
 			} else if ( typeof methodOrOptions === 'object' || ! methodOrOptions ) {
-				alert('called');
 				if(settings.is_first_time){
 					settings = new CORE();
 					$(this).data("settings", settings);
