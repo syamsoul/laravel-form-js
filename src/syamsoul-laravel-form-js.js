@@ -9,23 +9,23 @@
 		
         let modules = factory($);
         
-        window.SdAjax = modules['SdAjax'];
-        window.SdForm = modules['SdForm'];
+        jQuery.SdLarajax = $.SdLarajax = modules['SdLarajax'];
+        jQuery.fn.SdLaraform = $.fn.SdLaraform = modules['SdLaraform'];
         
-		module.exports = modules
+		module.exports = modules;
 	}
 	else {
 		// Browser
         let modules = factory(jQuery);
         
-        window.SdAjax = modules['SdAjax'];
-        window.SdForm = modules['SdForm'];
+		jQuery.SdLarajax = $.SdLarajax = modules['SdLarajax'];
+        jQuery.fn.SdLaraform = $.fn.SdLaraform = modules['SdLaraform'];
 	}
 }
 (function($) {
 	"use strict";
     
-    var SdAjax = function(opts, is_with_csrf=true){
+    $.SdLarajax = function(opts, is_with_csrf=true){
 		
 		let that = this;
 		
@@ -53,7 +53,7 @@
 				if(typeof opts['exec'] != "object") opts_new['exec'] = {};
 				else opts_new['exec'] = opts['exec'];
             }else{
-				console.log("There's something wrong with your SdForm configuration");
+				console.log("There's something wrong with your SdLaraform configuration");
 				return false;
 			}
             
@@ -98,13 +98,16 @@
 			return that;
 		};
 		
+		
+		return that;
+		
     }
     
-	var SdForm = function(form_el, opts={}, is_with_csrf=true){
+	$.fn.SdLaraform = function(opts={}, is_with_csrf=true){
 		
 		let that = this;
 		
-		let form_jel = $(form_el);
+		let form_jel = $(that);
 
 		let formUrl = form_jel.attr('action');
 		if(formUrl == undefined){
@@ -133,7 +136,7 @@
 				if(typeof opts['is_bs4_input'] != "boolean") opts_new['is_bs4_input'] = true;
 				else opts_new['is_bs4_input'] = opts['is_bs4_input'];
             }else{
-				console.log("There's something wrong with your SdForm configuration");
+				console.log("There's something wrong with your SdLaraform configuration");
 				return false;
 			}
 		
@@ -155,11 +158,11 @@
 			    return indexed_array;
 			})();
 			
-			(new SdAjax({
+			$.SdLarajax({
 				url: formUrl,
 				method: formMethod,
 				data: $.extend(formJson, opts_new['data'])
-			}, is_with_csrf)).beforeSend(()=>{
+			}, is_with_csrf).beforeSend(()=>{
 		        if(typeof opts_new['exec']['beforeSend'] == "function") opts_new['exec']['beforeSend']();
 		    }).send((res)=>{
 		        if(typeof opts_new['exec']['afterDone'] == "function") opts_new['exec']['afterDone'](res);
@@ -194,10 +197,12 @@
 				if(typeof opts_new['exec']['afterFail'] == "function") opts_new['exec']['afterFail'](res);
 			});
 		});
+		
+		return that;
     }
     
     return {
-        'SdAjax':SdAjax,
-        'SdForm':SdForm
+        'SdLarajax':$.SdLarajax,
+        'SdLaraform':$.fn.SdLaraform
     };
 }));
