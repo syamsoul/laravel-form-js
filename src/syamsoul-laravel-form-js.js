@@ -102,104 +102,146 @@
 		return that;
 		
     }
-    
-	$.fn.SdLaraform = function(opts={}, is_with_csrf=true){
-		
-		let that = this;
-		
-		let form_jel = $(that);
-
-		let formUrl = form_jel.attr('action');
-		if(formUrl == undefined){
-			console.log("Action(URL) is required");
-			return false;
-		}
-		
-		let formMethod = form_jel.attr('method');
-		if(formMethod == undefined){
-			formMethod = "POST";
-		}
-		
-		let opts_new = (function(){
-            let opts_new = {};
-		
-            if(typeof opts == "object"){               
-				if(typeof opts['data'] != "object") opts_new['data'] = {};
-				else opts_new['data'] = opts['data'];
-		
-				if(typeof opts['exec'] != "object") opts_new['exec'] = {};
-				else opts_new['exec'] = opts['exec'];
-				
-				if(typeof opts['error_class_name'] != "string") opts_new['error_class_name'] = 'sd-form-error';
-				else opts_new['error_class_name'] = opts['error_class_name'];
-				
-				if(typeof opts['is_bs4_input'] != "boolean") opts_new['is_bs4_input'] = true;
-				else opts_new['is_bs4_input'] = opts['is_bs4_input'];
-            }else{
-				console.log("There's something wrong with your SdLaraform configuration");
-				return false;
-			}
-		
-            return opts_new;
-        })();
-		
-        
-		form_jel.on('submit', function(e){
-			e.preventDefault();
-			
-			let formJson = (function($form){
-			    var unindexed_array = form_jel.serializeArray();
-			    var indexed_array = {};
 	
-			    $.map(unindexed_array, function(n, i){
-			        indexed_array[n['name']] = n['value'];
-			    });
 	
-			    return indexed_array;
-			})();
+	$.fn.SdLaraform = (()=>{
+		let CORE = function(){
+			let form_jel, opts_new;
 			
-			$.SdLarajax({
-				url: formUrl,
-				method: formMethod,
-				data: $.extend(formJson, opts_new['data'])
-			}, is_with_csrf).beforeSend(()=>{
-		        if(typeof opts_new['exec']['beforeSend'] == "function") opts_new['exec']['beforeSend']();
-		    }).send((res)=>{
-		        if(typeof opts_new['exec']['afterDone'] == "function") opts_new['exec']['afterDone'](res);
-		    }, (res)=>{
-				if(res.status == 422){
-					let errors = res.responseJSON.errors;
+			this.methods = {
+				init : function(opts) {
+					let that = this;
 					
-					form_jel.find('.'+opts_new['error_class_name']).html('');
-					form_jel.find('.'+opts_new['error_class_name']).each((index, el)=>{
-						let input_name = $(el).attr('data-inputname');
+					form_jel = $(that);
+			
+					let formUrl = form_jel.attr('action');
+					if(formUrl == undefined){
+						$.error("Action(URL) is required");
+						return false;
+					}
+					
+					let formMethod = form_jel.attr('method');
+					if(formMethod == undefined){
+						formMethod = "POST";
+					}
+					
+					opts_new = (function(){
+			            let opts_new = {};
+					
+			            if(typeof opts == "object"){               
+							if(typeof opts['data'] != "object") opts_new['data'] = {};
+							else opts_new['data'] = opts['data'];
+					
+							if(typeof opts['exec'] != "object") opts_new['exec'] = {};
+							else opts_new['exec'] = opts['exec'];
+							
+							if(typeof opts['error_class_name'] != "string") opts_new['error_class_name'] = 'sd-form-error';
+							else opts_new['error_class_name'] = opts['error_class_name'];
+							
+							if(typeof opts['is_bs4_input'] != "boolean") opts_new['is_bs4_input'] = true;
+							else opts_new['is_bs4_input'] = opts['is_bs4_input'];
+							
+							if(typeof opts['is_with_csrf'] != "boolean") opts_new['is_with_csrf'] = true;
+							else opts_new['is_with_csrf'] = opts['is_with_csrf'];
+			            }else{
+							console.log("There's something wrong with your SdLaraform configuration");
+							return false;
+						}
+					
+			            return opts_new;
+			        })();
+					
+			        
+					form_jel.on('submit', function(e){
+						e.preventDefault();
 						
-						if(input_name == undefined) $(el).html(errors[Object.keys(errors)[0]]);
-						else{
-							if(typeof errors[input_name] != "undefined"){
-								$(el).html(errors[input_name]);
+						let formJson = (function($form){
+						    var unindexed_array = form_jel.serializeArray();
+						    var indexed_array = {};
+				
+						    $.map(unindexed_array, function(n, i){
+						        indexed_array[n['name']] = n['value'];
+						    });
+				
+						    return indexed_array;
+						})();
+						
+						$.SdLarajax({
+							url: formUrl,
+							method: formMethod,
+							data: $.extend(formJson, opts_new['data'])
+						}, opts_new['is_with_csrf']).beforeSend(()=>{
+					        if(typeof opts_new['exec']['beforeSend'] == "function") opts_new['exec']['beforeSend']();
+					    }).send((res)=>{
+					        if(typeof opts_new['exec']['afterDone'] == "function") opts_new['exec']['afterDone'](res);
+					    }, (res)=>{
+							if(res.status == 422){
+								let errors = res.responseJSON.errors;
+								
+								form_jel.find('.'+opts_new['error_class_name']).html('');
+								form_jel.find('.'+opts_new['error_class_name']).each((index, el)=>{
+									let input_name = $(el).attr('data-inputname');
+									
+									if(input_name == undefined) $(el).html(errors[Object.keys(errors)[0]]);
+									else{
+										if(typeof errors[input_name] != "undefined"){
+											$(el).html(errors[input_name]);
+											if(opts_new['is_bs4_input']){
+												console.log(input_name);
+												form_jel.find('[name="'+input_name+'"]').addClass('is-invalid-new');
+											}
+										}
+									}
+								});
+								
 								if(opts_new['is_bs4_input']){
-									console.log(input_name);
-									form_jel.find('[name="'+input_name+'"]').addClass('is-invalid-new');
+									form_jel.find('.form-control.is-valid').removeClass('is-valid');
+									form_jel.find('.form-control.is-invalid:not(.is-invalid-new)').removeClass('is-invalid').addClass('is-valid');
+									form_jel.find('.form-control.is-invalid').removeClass('is-invalid');
+									form_jel.find('.form-control.is-invalid-new').removeClass('is-invalid-new').addClass('is-invalid');
 								}
 							}
-						}
+							
+							if(typeof opts_new['exec']['afterFail'] == "function") opts_new['exec']['afterFail'](res);
+						});
 					});
 					
-					if(opts_new['is_bs4_input']){
-						form_jel.find('.form-control.is-valid').removeClass('is-valid');
-						form_jel.find('.form-control.is-invalid:not(.is-invalid-new)').removeClass('is-invalid').addClass('is-valid');
-						form_jel.find('.form-control.is-invalid').removeClass('is-invalid');
-						form_jel.find('.form-control.is-invalid-new').removeClass('is-invalid-new').addClass('is-invalid');
-					}
+					return that;
+				},
+				clear : function() { 
+					form_jel[0].reset();
 				}
+			};
+		};
+	
+	    return function(methodOrOptions) {
+			let settings = $(this).data("settings");
+			 
+			if(settings == undefined){
+				settings = {is_first_time:true,methods:{}};
+				$(this).data("settings", settings);
+			}
+			
+			let methods = settings.methods;
+			
+			if ( methods[methodOrOptions] ) {
+				return methods[ methodOrOptions ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+			} else if ( typeof methodOrOptions === 'object' || ! methodOrOptions ) {
+				alert('called');
+				if(settings.is_first_time){
+					settings = new CORE();
+					$(this).data("settings", settings);
 				
-				if(typeof opts_new['exec']['afterFail'] == "function") opts_new['exec']['afterFail'](res);
-			});
-		});
-		
-		return that;
-    }
+					// Default to "init"
+					return settings.methods.init.apply( this, arguments );
+				}else{
+					$.error( 'Method init cannot be called multiple times' );
+				}				
+			} else {
+				$.error( 'Method ' +  methodOrOptions + ' does not exist on jQuery.SdLaraform' );
+			}    
+		};
+	})();
     
     return {
         'SdLarajax':$.SdLarajax,
