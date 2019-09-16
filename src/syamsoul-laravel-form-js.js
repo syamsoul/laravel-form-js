@@ -92,7 +92,7 @@
 	        $.ajax(ajax_opts).done((res)=>{
 	            if(typeof execAfterDone == "function") execAfterDone(res);
 	        }).fail((res)=>{
-	            if(typeof execAfterFail == "function") execAfterFail(res);
+	            if(typeof execAfterFail == "function") execAfterFail(res.responseJSON, res.status, res);
 	        });
 			
 			return that;
