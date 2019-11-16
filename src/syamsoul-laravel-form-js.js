@@ -210,6 +210,9 @@
 				},
 				clear : function() { 
 					form_jel[0].reset();
+					form_jel.find('.form-control.is-valid').removeClass('is-valid');
+					form_jel.find('.form-control.is-invalid').removeClass('is-invalid');
+					form_jel.find('.'+opts_new['error_class_name']).html('');
 				}
 			};
 		};
