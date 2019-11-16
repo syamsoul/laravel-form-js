@@ -113,23 +113,12 @@
 					let that = this;
 					
 					form_jel = $(that);
-			
-					let formUrl = form_jel.attr('action');
-					if(formUrl == undefined){
-						$.error("Action(URL) is required");
-						return false;
-					}
-					
-					let formMethod = form_jel.attr('method');
-					if(formMethod == undefined){
-						formMethod = "POST";
-					}
 					
 					opts_new = (function(){
 			            let opts_new = {};
 					
 			            if(typeof opts == "object"){               
-							if(typeof opts['data'] != "object") opts_new['data'] = {};
+							if(typeof opts['data'] != "object" && typeof opts['data'] != "function") opts_new['data'] = {};
 							else opts_new['data'] = opts['data'];
 					
 							if(typeof opts['exec'] != "object") opts_new['exec'] = {};
@@ -166,10 +155,25 @@
 						    return indexed_array;
 						})();
 						
+						
+						let formUrl = form_jel.attr('action');
+						if(formUrl == undefined){
+							$.error("Action(URL) is required");
+							return false;
+						}
+						
+						let formMethod = form_jel.attr('method');
+						if(formMethod == undefined){
+							formMethod = "POST";
+						}
+						
+						let extra_data = opts_new['data'];
+						if(typeof opts_new['data'] == "function") extra_data = opts_new['data']();						
+						
 						$.SdLarajax({
 							url: formUrl,
 							method: formMethod,
-							data: $.extend(formJson, opts_new['data'])
+							data: $.extend(formJson, extra_data)
 						}, opts_new['is_with_csrf']).beforeSend(()=>{
 					        if(typeof opts_new['exec']['beforeSend'] == "function") opts_new['exec']['beforeSend']();
 					    }).send((res)=>{
@@ -187,7 +191,6 @@
 										if(typeof errors[input_name] != "undefined"){
 											$(el).html(errors[input_name]);
 											if(opts_new['is_bs4_input']){
-												console.log(input_name);
 												form_jel.find('[name="'+input_name+'"]').addClass('is-invalid-new');
 											}
 										}
