@@ -174,9 +174,9 @@
 					        if(typeof opts_new['exec']['beforeSend'] == "function") opts_new['exec']['beforeSend']();
 					    }).send((res)=>{
 					        if(typeof opts_new['exec']['afterDone'] == "function") opts_new['exec']['afterDone'](res);
-					    }, (res)=>{
-							if(res.status == 422){
-								let errors = res.responseJSON.errors;
+					    }, (res, errorStatus)=>{
+							if(errorStatus == 422){
+								let errors = res.errors;
 								
 								form_jel.find('.'+opts_new['error_class_name']).html('');
 								form_jel.find('.'+opts_new['error_class_name']).each((index, el)=>{
@@ -202,7 +202,7 @@
 								}
 							}
 							
-							if(typeof opts_new['exec']['afterFail'] == "function") opts_new['exec']['afterFail'](res);
+							if(typeof opts_new['exec']['afterFail'] == "function") opts_new['exec']['afterFail'](res, errorStatus);
 						});
 					});
 					
