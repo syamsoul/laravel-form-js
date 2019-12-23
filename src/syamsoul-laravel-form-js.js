@@ -176,6 +176,7 @@
 					        if(typeof opts_new['exec']['beforeSend'] == "function") opts_new['exec']['beforeSend']();
 					    }).send((res)=>{
 					        if(typeof opts_new['exec']['afterDone'] == "function") opts_new['exec']['afterDone'](res);
+							if(typeof opts_new['exec']['afterCompleted'] == "function") opts_new['exec']['afterCompleted'](res);
 					    }, (res, errorStatus)=>{
 							if(errorStatus == 422){
 								let errors = res.errors;
@@ -204,6 +205,7 @@
 							}
 							
 							if(typeof opts_new['exec']['afterFail'] == "function") opts_new['exec']['afterFail'](res, errorStatus);
+							if(typeof opts_new['exec']['afterCompleted'] == "function") opts_new['exec']['afterCompleted'](res);
 						});
 					});
 					
